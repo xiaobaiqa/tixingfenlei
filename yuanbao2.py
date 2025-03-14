@@ -159,7 +159,7 @@ def train () :
     # 过滤有效样本
     print ("Filtering valid samples...")
     valid_ids = []
-    for idx, img_id in enumerate (img_ids [:5000]) :  # 限制样本数量
+    for idx, img_id in enumerate (img_ids [:4000]) :  # 限制样本数量
         ann_ids = coco.getAnnIds (imgIds=img_id)
         anns = coco.loadAnns (ann_ids)
         if any (ann ['num_keypoints'] >= 10 for ann in anns) :
@@ -239,7 +239,9 @@ def train () :
     if test_features is not None :
         print ("\nFinal Classification Report:")
         print (classification_report (test_labels.cpu (), preds.cpu ()))
-
+    # 训练结束后保存模型
+    torch.save(model.state_dict(), "body_classifier.pth")
+    print(f"Model saved to body_classifier.pth")
 
 if __name__ == "__main__" :
     train ()

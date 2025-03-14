@@ -69,14 +69,18 @@ class BodyDataset (torch.utils.data.Dataset) :
             # 提取关键点并确保顺序
             kpts = np.array (main_ann ['keypoints']).reshape (-1, 3)
             visible = kpts [:, 2] > 0
-            kpts = kpts [visible, :2]
+            visible_indices = np.where (visible) [0]  # 可见关键点的原始ID
 
-            # 按COCO索引排序并验证
-            sorted_indices = sorted (range (len (kpts)), key=lambda i : np.where (visible) [0] [i])
-            kpts = kpts [sorted_indices]
+            # 过滤不可见点并保留坐标
+            kpts_visible = kpts [visible, :2]
 
-            # 提取几何特征
-            features = self._extract_geo_features (kpts)
+            # 按原始关键点ID排序
+            sorted_order = np.argsort (visible_indices)
+            kpts_sorted = kpts_visible [sorted_order]
+            original_ids = visible_indices [sorted_order]  # 排序后的原始ID列表
+
+            # 提取几何特征（传入排序后的关键点和原始ID）
+            features = self._extract_geo_features (kpts_sorted, original_ids)
             if features is None :
                 return None
 
@@ -88,11 +92,23 @@ class BodyDataset (torch.utils.data.Dataset) :
             print (f"Error processing image {img_id}: {str (e)}")
             return None
 
-    def _extract_geo_features (self, kpts) :
-        """提取几何特征（带完整性检查）"""
+    def _extract_geo_features (self, kpts, original_ids) :
+        """提取几何特征（基于原始关键点ID定位）"""
         try :
-            # 获取关键点索引
-            idx_map = {i : kpt_id for kpt_id, i in enumerate (self.kpt_names.keys ())}
+            # 定义所需关键点的COCO ID
+            required_ids = [5, 6, 11, 12]
+
+            # 检查是否所有必需关键点都存在
+            for req_id in required_ids :
+                if req_id not in original_ids :
+                    print (f"Missing required keypoint ID: {req_id}")
+                    return None
+
+            # 获取各个关键点的索引
+            idx_map = {
+                req_id : np.where (original_ids == req_id) [0] [0]
+                for req_id in required_ids
+            }
 
             left_shoulder = kpts [idx_map [5]]
             right_shoulder = kpts [idx_map [6]]
@@ -104,14 +120,19 @@ class BodyDataset (torch.utils.data.Dataset) :
             hip_width = np.linalg.norm (left_hip - right_hip)
             torso_height = (left_hip [1] + right_hip [1]) / 2 - (left_shoulder [1] + right_shoulder [1]) / 2
 
+            # 处理分母为零的情况
+            if hip_width == 0 or torso_height == 0 :
+                print ("Invalid feature: division by zero")
+                return None
+
             return [
-                shoulder_width / hip_width if hip_width != 0 else 0,
-                shoulder_width / torso_height if torso_height != 0 else 0,
-                (left_shoulder [0] - left_hip [0]) / hip_width if hip_width != 0 else 0,
-                (right_shoulder [0] - right_hip [0]) / hip_width if hip_width != 0 else 0
+                shoulder_width / hip_width,
+                shoulder_width / torso_height,
+                (left_shoulder [0] - left_hip [0]) / hip_width,
+                (right_shoulder [0] - right_hip [0]) / hip_width
             ]
-        except KeyError as e :
-            print (f"Missing keypoint: {str (e)}")
+        except Exception as e :
+            print (f"Error in feature extraction: {str (e)}")
             return None
 
     def _assign_body_type (self, features) :

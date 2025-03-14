@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f120bcd3-eb17-4796-b77a-dd5fe6e788c1" name="更改" comment="v1">
-      <change afterPath="$PROJECT_DIR$/dantu.py" afterDir="false" />
+    <list default="true" id="f120bcd3-eb17-4796-b77a-dd5fe6e788c1" name="更改" comment="添加了单图预测代码（未改好）和体型参数返回，v1.1">
+      <change afterPath="$PROJECT_DIR$/tixingfenleiV2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/body_classifier.pth" beforeDir="false" afterPath="$PROJECT_DIR$/body_classifier.pth" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dantu.py" beforeDir="false" afterPath="$PROJECT_DIR$/dantu.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/yuanbao2.py" beforeDir="false" afterPath="$PROJECT_DIR$/yuanbao2.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -66,7 +69,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741924564299</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="添加了单图预测代码（未改好）和体型参数返回，v1.1">
+      <option name="closed" value="true" />
+      <created>1741937958529</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1741937958529</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -82,6 +93,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="v1" />
-    <option name="LAST_COMMIT_MESSAGE" value="v1" />
+    <MESSAGE value="添加了单图预测代码（未改好）和体型参数返回，v1.1" />
+    <option name="LAST_COMMIT_MESSAGE" value="添加了单图预测代码（未改好）和体型参数返回，v1.1" />
   </component>
 </project>

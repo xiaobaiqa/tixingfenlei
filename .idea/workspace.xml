@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f120bcd3-eb17-4796-b77a-dd5fe6e788c1" name="更改" comment="添加了单图预测代码（未改好）和体型参数返回，v1.1">
-      <change afterPath="$PROJECT_DIR$/tixingfenleiV2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="f120bcd3-eb17-4796-b77a-dd5fe6e788c1" name="更改" comment="修改了特征提取的提取方法，但是好像效果一般V2.1">
+      <change afterPath="$PROJECT_DIR$/pinggu.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tezhengtiqu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/best_model.pth" beforeDir="false" afterPath="$PROJECT_DIR$/best_model.pth" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/body_classifier.pth" beforeDir="false" afterPath="$PROJECT_DIR$/body_classifier.pth" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dantu.py" beforeDir="false" afterPath="$PROJECT_DIR$/dantu.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/yuanbao2.py" beforeDir="false" afterPath="$PROJECT_DIR$/yuanbao2.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -25,6 +25,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectColorInfo"><![CDATA[{
   "associatedIndex": 1
@@ -77,7 +80,23 @@
       <option name="project" value="LOCAL" />
       <updated>1741937958529</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="修改了特征提取的提取方法，但是好像效果一般V2.1">
+      <option name="closed" value="true" />
+      <created>1741944244689</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1741944244689</updated>
+    </task>
+    <task id="LOCAL-00004" summary="修改了特征提取的提取方法，但是好像效果一般V2.1">
+      <option name="closed" value="true" />
+      <created>1741944274701</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1741944274701</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -94,6 +113,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="v1" />
     <MESSAGE value="添加了单图预测代码（未改好）和体型参数返回，v1.1" />
-    <option name="LAST_COMMIT_MESSAGE" value="添加了单图预测代码（未改好）和体型参数返回，v1.1" />
+    <MESSAGE value="修改了特征提取的提取方法，但是好像效果一般V2.1" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改了特征提取的提取方法，但是好像效果一般V2.1" />
   </component>
 </project>

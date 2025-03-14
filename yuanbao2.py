@@ -122,7 +122,7 @@ class BodyDataset (torch.utils.data.Dataset) :
 
             # 处理分母为零的情况
             if hip_width == 0 or torso_height == 0 :
-                print ("Invalid feature: division by zero")
+                ##print ("Invalid feature: division by zero")
                 return None
 
             return [

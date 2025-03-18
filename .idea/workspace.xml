@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f120bcd3-eb17-4796-b77a-dd5fe6e788c1" name="更改" comment="对V2版本中的最好模型进行了评估，类别分布不平衡，后续需要平衡一下类别V1.3">
-      <change afterPath="$PROJECT_DIR$/dantudetect.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dantukeypoint.py" afterDir="false" />
+    <list default="true" id="f120bcd3-eb17-4796-b77a-dd5fe6e788c1" name="更改" comment="添加了单图关键点检测程序和单图体型分类显示程序，下一步根据体型分类显示想一下怎么通过深度学习学习到分类的特征">
+      <change afterPath="$PROJECT_DIR$/cnn.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shujuyanzheng.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dantu.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dantudetect.py" beforeDir="false" afterPath="$PROJECT_DIR$/dantudetect.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,7 +103,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741953336536</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="添加了单图关键点检测程序和单图体型分类显示程序，下一步根据体型分类显示想一下怎么通过深度学习学习到分类的特征">
+      <option name="closed" value="true" />
+      <created>1742269916591</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1742269916591</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -132,6 +140,7 @@
     <MESSAGE value="添加了单图预测代码（未改好）和体型参数返回，v1.1" />
     <MESSAGE value="修改了特征提取的提取方法，但是好像效果一般V2.1" />
     <MESSAGE value="对V2版本中的最好模型进行了评估，类别分布不平衡，后续需要平衡一下类别V1.3" />
-    <option name="LAST_COMMIT_MESSAGE" value="对V2版本中的最好模型进行了评估，类别分布不平衡，后续需要平衡一下类别V1.3" />
+    <MESSAGE value="添加了单图关键点检测程序和单图体型分类显示程序，下一步根据体型分类显示想一下怎么通过深度学习学习到分类的特征" />
+    <option name="LAST_COMMIT_MESSAGE" value="添加了单图关键点检测程序和单图体型分类显示程序，下一步根据体型分类显示想一下怎么通过深度学习学习到分类的特征" />
   </component>
 </project>

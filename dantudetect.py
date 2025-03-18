@@ -1,4 +1,5 @@
 import os
+import random
 import numpy as np
 import cv2
 from pycocotools.coco import COCO
@@ -24,7 +25,7 @@ class BodyTypeAnalyzer :
         }
 
     def load_valid_instances (self, min_keypoints=10) :
-        """加载符合条件的人体实例"""
+        """加载所有有效实例"""
         cat_ids = self.coco.getCatIds (catNms=['person'])
         img_ids = self.coco.getImgIds (catIds=cat_ids)
 
@@ -90,18 +91,43 @@ class BodyTypeAnalyzer :
         else :
             return 'Standard'
 
-    def visualize_result (self, entry, output_dir='output') :
-        """生成可视化结果"""
+    def visualize_results (self, entries, output_dir='output') :
+        """批量可视化结果"""
         os.makedirs (output_dir, exist_ok=True)
+        plt.figure (figsize=(15, 10))
 
-        # 加载图像
-        img_info = self.coco.loadImgs (entry ['img_id']) [0]
-        img_path = os.path.join (self.img_dir, img_info ['file_name'])
-        img = cv2.cvtColor (cv2.imread (img_path), cv2.COLOR_BGR2RGB)
+        for i, entry in enumerate (entries) :
+            # 加载图像
+            img_info = self.coco.loadImgs (entry ['img_id']) [0]
+            img_path = os.path.join (self.img_dir, img_info ['file_name'])
+            img = cv2.cvtColor (cv2.imread (img_path), cv2.COLOR_BGR2RGB)
 
+            # 绘制关键点和骨架
+            self._draw_pose (img, entry ['kpts'])
+
+            # 添加分类信息
+            body_type, ratios = entry ['result']
+            text = f"{body_type}\nSHR:{ratios ['shoulder_hip_ratio']:.2f} WHR:{ratios ['waist_hip_ratio']:.2f}"
+
+            # 显示子图
+            plt.subplot (2, 3, i + 1)
+            plt.imshow (img)
+            plt.title (f"Image ID: {entry ['img_id']}\n{text}")
+            plt.axis ('off')
+
+        plt.tight_layout ()
+
+        # 保存并显示
+        output_path = os.path.join (output_dir, "random_results.jpg")
+        plt.savefig (output_path, bbox_inches='tight')
+        plt.show ()
+        return output_path
+
+    def _draw_pose (self, img, kpts) :
+        """绘制骨骼关键点"""
         # 绘制关键点
         for kid in range (17) :
-            x, y, v = entry ['kpts'] [kid]
+            x, y, v = kpts [kid]
             if v > 0 :
                 color = (0, 255, 0) if kid in [5, 7, 9, 11, 13, 15] else (0, 0, 255)
                 cv2.circle (img, (int (x), int (y)), 5, color, -1)
@@ -109,39 +135,33 @@ class BodyTypeAnalyzer :
         # 绘制骨架
         for (s, e, color_name) in self.skeleton :
             if s < 17 and e < 17 :
-                x1, y1, v1 = entry ['kpts'] [s]
-                x2, y2, v2 = entry ['kpts'] [e]
+                x1, y1, v1 = kpts [s]
+                x2, y2, v2 = kpts [e]
                 if v1 > 0 and v2 > 0 :
                     cv2.line (img, (int (x1), int (y1)), (int (x2), int (y2)),
                               self.color_map [color_name], 2)
 
-        # 添加分类信息
-        body_type, ratios = entry ['result']
-        text = f"{body_type} SHR:{ratios ['shoulder_hip_ratio']:.2f} WHR:{ratios ['waist_hip_ratio']:.2f}"
-        cv2.putText (img, text, (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
-
-        # 保存结果
-        output_path = os.path.join (output_dir, f"result_{entry ['img_id']}.jpg")
-        cv2.imwrite (output_path, cv2.cvtColor (img, cv2.COLOR_RGB2BGR))
-        return output_path
-
 
 if __name__ == "__main__" :
+    # 初始化分析器
     analyzer = BodyTypeAnalyzer (r"C:\datasets\coco2017")
-    instances = analyzer.load_valid_instances (min_keypoints=10)
 
-    print (f"找到 {len (instances)} 个有效人体实例")
-    if not instances :
+    # 加载所有有效实例
+    all_instances = analyzer.load_valid_instances (min_keypoints=10)
+
+    if not all_instances :
+        print ("未找到有效样本")
         exit ()
 
-    # 处理前5个样本作为示例
-    for entry in instances [:5] :
-        # 进行分类
+    # 随机选取5个样本（允许重复）
+    random.seed ()  # 使用系统时间作为随机种子
+    selected_instances = random.sample (all_instances, k=min (5, len (all_instances)))
+
+    # 进行分类
+    for entry in selected_instances :
         body_type, ratios = analyzer.classify_body_type (entry ['kpts'])
         entry ['result'] = (body_type, ratios)
 
-        # 生成可视化结果
-        output_path = analyzer.visualize_result (entry)
-        print (f"已保存结果到: {output_path}")
-        print (
-            f"detect_result: {body_type}, SHR={ratios ['shoulder_hip_ratio']:.2f}, WHR={ratios ['waist_hip_ratio']:.2f}\n")
+    # 批量可视化
+    output_path = analyzer.visualize_results (selected_instances)
+    print (f"随机抽样结果已保存至：{output_path}")

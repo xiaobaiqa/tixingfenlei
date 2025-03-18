@@ -4,12 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f120bcd3-eb17-4796-b77a-dd5fe6e788c1" name="更改" comment="修改了特征提取的提取方法，但是好像效果一般V2.1">
-      <change afterPath="$PROJECT_DIR$/pinggu.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tezhengtiqu.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/best_model.pth" beforeDir="false" afterPath="$PROJECT_DIR$/best_model.pth" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/body_classifier.pth" beforeDir="false" afterPath="$PROJECT_DIR$/body_classifier.pth" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yuanbao2.py" beforeDir="false" afterPath="$PROJECT_DIR$/yuanbao2.py" afterDir="false" />
+    <list default="true" id="f120bcd3-eb17-4796-b77a-dd5fe6e788c1" name="更改" comment="对V2版本中的最好模型进行了评估，类别分布不平衡，后续需要平衡一下类别V1.3">
+      <change afterPath="$PROJECT_DIR$/dantudetect.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dantukeypoint.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dantu.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,9 +28,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 1
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
   <component name="ProjectId" id="2uI65bTKjgyeZXjqKgilMRovwXG" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -40,16 +39,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "D:/biyesheji/code/tixingfenlei",
-    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/biyesheji/code/tixingfenlei&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\biyesheji\code\tixingfenlei" />
@@ -96,12 +95,30 @@
       <option name="project" value="LOCAL" />
       <updated>1741944274701</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="对V2版本中的最好模型进行了评估，类别分布不平衡，后续需要平衡一下类别V1.3">
+      <option name="closed" value="true" />
+      <created>1741953336536</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1741953336536</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="9605f390-7554-469d-a78d-adae16677c38" value="TOOL_WINDOW" />
+      </map>
+    </option>
     <option name="TAB_STATES">
       <map>
+        <entry key="9605f390-7554-469d-a78d-adae16677c38">
+          <value>
+            <State />
+          </value>
+        </entry>
         <entry key="MAIN">
           <value>
             <State />
@@ -114,6 +131,7 @@
     <MESSAGE value="v1" />
     <MESSAGE value="添加了单图预测代码（未改好）和体型参数返回，v1.1" />
     <MESSAGE value="修改了特征提取的提取方法，但是好像效果一般V2.1" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改了特征提取的提取方法，但是好像效果一般V2.1" />
+    <MESSAGE value="对V2版本中的最好模型进行了评估，类别分布不平衡，后续需要平衡一下类别V1.3" />
+    <option name="LAST_COMMIT_MESSAGE" value="对V2版本中的最好模型进行了评估，类别分布不平衡，后续需要平衡一下类别V1.3" />
   </component>
 </project>

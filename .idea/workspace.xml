@@ -4,11 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f120bcd3-eb17-4796-b77a-dd5fe6e788c1" name="更改" comment="添加了单图关键点检测程序和单图体型分类显示程序，下一步根据体型分类显示想一下怎么通过深度学习学习到分类的特征">
-      <change afterPath="$PROJECT_DIR$/cnn.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/shujuyanzheng.py" afterDir="false" />
+    <list default="true" id="f120bcd3-eb17-4796-b77a-dd5fe6e788c1" name="更改" comment="新增了标签序列metadata，增加了通过标签序列进行预测的cnn模型，下一步修改模型至可用程度">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dantudetect.py" beforeDir="false" afterPath="$PROJECT_DIR$/dantudetect.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/cnn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/metadata.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/split_data/train_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/split_data/train_metadata.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/split_data/val_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/split_data/val_metadata.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -111,7 +112,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742269916591</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="新增了标签序列metadata，增加了通过标签序列进行预测的cnn模型，下一步修改模型至可用程度">
+      <option name="closed" value="true" />
+      <created>1742295143217</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1742295143217</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -141,6 +150,7 @@
     <MESSAGE value="修改了特征提取的提取方法，但是好像效果一般V2.1" />
     <MESSAGE value="对V2版本中的最好模型进行了评估，类别分布不平衡，后续需要平衡一下类别V1.3" />
     <MESSAGE value="添加了单图关键点检测程序和单图体型分类显示程序，下一步根据体型分类显示想一下怎么通过深度学习学习到分类的特征" />
-    <option name="LAST_COMMIT_MESSAGE" value="添加了单图关键点检测程序和单图体型分类显示程序，下一步根据体型分类显示想一下怎么通过深度学习学习到分类的特征" />
+    <MESSAGE value="新增了标签序列metadata，增加了通过标签序列进行预测的cnn模型，下一步修改模型至可用程度" />
+    <option name="LAST_COMMIT_MESSAGE" value="新增了标签序列metadata，增加了通过标签序列进行预测的cnn模型，下一步修改模型至可用程度" />
   </component>
 </project>

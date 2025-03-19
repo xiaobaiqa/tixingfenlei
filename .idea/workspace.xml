@@ -4,11 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f120bcd3-eb17-4796-b77a-dd5fe6e788c1" name="更改" comment="增加了resnet50网络训练的模型，但是好像该模型过拟合了">
+    <list default="true" id="f120bcd3-eb17-4796-b77a-dd5fe6e788c1" name="更改" comment="给resnet模型增加了正则化步骤，过拟合的问题缓解了，但是目前该模型的正确率只有40%，后续看一下混淆矩阵的情况再提高模型的正确率">
+      <change afterPath="$PROJECT_DIR$/duomotai.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ResNet-50.py" beforeDir="false" afterPath="$PROJECT_DIR$/ResNet-50.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/body_type_resnet50.pth" beforeDir="false" afterPath="$PROJECT_DIR$/body_type_resnet50.pth" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/metadata.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/shujuyanzheng.py" beforeDir="false" afterPath="$PROJECT_DIR$/shujuyanzheng.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/split_data/train_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/split_data/train_metadata.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/split_data/val_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/split_data/val_metadata.json" afterDir="false" />
     </list>
@@ -25,12 +26,6 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="PUSH_TAGS">
-      <GitPushTagMode>
-        <option name="argument" value="--tags" />
-        <option name="title" value="All" />
-      </GitPushTagMode>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -143,7 +138,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742306808092</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="给resnet模型增加了正则化步骤，过拟合的问题缓解了，但是目前该模型的正确率只有40%，后续看一下混淆矩阵的情况再提高模型的正确率">
+      <option name="closed" value="true" />
+      <created>1742361145877</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1742361145877</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -161,7 +164,19 @@
         </entry>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -176,6 +191,7 @@
     <MESSAGE value="新增了标签序列metadata，增加了通过标签序列进行预测的cnn模型，下一步修改模型至可用程度" />
     <MESSAGE value="增加了cnn训练好的模型path，并且在cnn模型代码中增加了预测模型，但是目前的问题是该模型没有学习到特征，预测结果全部一样，下一步看看是修改模型还是修改数据集的结构" />
     <MESSAGE value="增加了resnet50网络训练的模型，但是好像该模型过拟合了" />
-    <option name="LAST_COMMIT_MESSAGE" value="增加了resnet50网络训练的模型，但是好像该模型过拟合了" />
+    <MESSAGE value="给resnet模型增加了正则化步骤，过拟合的问题缓解了，但是目前该模型的正确率只有40%，后续看一下混淆矩阵的情况再提高模型的正确率" />
+    <option name="LAST_COMMIT_MESSAGE" value="给resnet模型增加了正则化步骤，过拟合的问题缓解了，但是目前该模型的正确率只有40%，后续看一下混淆矩阵的情况再提高模型的正确率" />
   </component>
 </project>

@@ -10,30 +10,32 @@ from pycocotools.coco import COCO
 import matplotlib.pyplot as plt
 import torchvision.models as models  # 新增导入
 from torchvision.models.resnet import ResNet50_Weights
+from sklearn.metrics import confusion_matrix, classification_report
+import seaborn as sns
 
-# 类别标签映射
+# 更新类别映射
 class_names = {
-    0 : "沙漏型",
-    1 : "倒三角型",
-    2 : "梨型",
-    3 : "标准型"
+    0: "倒三角形",
+    1: "矩形(H型)",
+    2: "椭圆形"
 }
 
 
-# 配置参数（修改输入尺寸）
+# 配置参数
 class Config :
     data_path = r"C:\datasets\coco2017"
     ann_file = os.path.join (data_path, "annotations/person_keypoints_train2017.json")
     img_dir = os.path.join (data_path, "train2017")
     batch_size = 8  # 可适当增大batch_size
-    num_classes = 4
+    num_classes = 3
+    num_epoch = 10
     img_size = (224, 224)  # 修改为标准输入尺寸
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
     device = torch.device ("cuda" if torch.cuda.is_available () else "cpu")
 
 
-# 图像预处理函数（保持相同逻辑）
+# 图像预处理函数
 def preprocess_image (img) :
     img = cv2.resize (img, (Config.img_size [1], Config.img_size [0]))  # 使用新尺寸
     img = img.astype (np.float32) / 255.0
@@ -67,7 +69,7 @@ class CustomResNet (nn.Module) :
         self.base = models.resnet50 (weights=None)
         # 仅替换最后的全连接层
         self.base.fc = nn.Sequential (
-            nn.Dropout (0.5),
+            nn.Dropout (0.7),
             nn.Linear (2048, 512),
             nn.ReLU (),
             nn.Dropout (0.3),
@@ -77,7 +79,7 @@ class CustomResNet (nn.Module) :
     def forward (self, x) :
         return self.base (x)
 
-# 生成元数据（保持不变）
+
 def generate_metadata () :
     if os.path.exists ("metadata.json") :
         with open ("metadata.json") as f :
@@ -85,66 +87,110 @@ def generate_metadata () :
 
     coco = COCO (Config.ann_file)
     metadata = []
-    class_counts = {cls : 0 for cls in class_names.keys ()}  # 初始化类别计数器
-    target_per_class = 1000  # 每个类别目标样本数
+    class_counts = {cls : 0 for cls in class_names.keys ()}
+    target_per_class = 500
 
-    # 遍历所有人体图像
+    # 增强过滤参数
+    HIP_X_DIFF_RATIO = 0.25
+    SHOULDER_X_DIFF_RATIO = 0.25
+    MIN_VISIBILITY = 0
+    MIN_HEIGHT_RATIO = 0.25  # 人物最小高度占比
+    MIN_AREA_RATIO = 0.1  # 人物最小面积占比
+    MIN_JOINT_DIST = 0.15  # 关键点最小间距（相对图像宽度）
+
     for img_id in coco.getImgIds (catIds=coco.getCatIds ('person')) :
         if all (count >= target_per_class for count in class_counts.values ()) :
-            break  # 所有类别都达到目标时提前终止
+            break
 
         img_info = coco.loadImgs (img_id) [0]
         img_path = os.path.join (Config.img_dir, img_info ["file_name"])
+        img_w, img_h = img_info ["width"], img_info ["height"]
+        img_area = img_w * img_h
 
         if not os.path.exists (img_path) :
             continue
 
-        # 遍历所有有效标注
+        # 阶段1：筛选有效标注
+        valid_anns = []
         for ann in coco.loadAnns (coco.getAnnIds (imgIds=img_id, iscrowd=False)) :
-            if ann ["num_keypoints"] >= 10 :
-                kpts = np.array (ann ["keypoints"]).reshape (-1, 3)
+            if ann ["num_keypoints"] < 10 :
+                continue
 
-                # 关键点有效性检查
-                if all (kpts [i, 2] > 0 for i in [5, 6, 11, 12]) :
-                    # 新增质量控制检查
-                    left_shoulder = kpts[5]
-                    right_shoulder = kpts[6]
-                    left_hip = kpts[11]
-                    right_hip = kpts[12]
+            # 计算边界框参数
+            x, y, w, h = ann ["bbox"]
+            ann_area = ann ["area"]
+            height_ratio = h / img_h
+            area_ratio = ann_area / img_area
 
-                    # # 检查1: 左右关键点位置逻辑
-                    # if (left_shoulder[0] < left_hip[0]) or (right_shoulder[0] > right_hip[0]):
-                    #     continue  # 排除左肩在左髋左侧/右肩在右髋右侧的情况
+            # 尺寸过滤
+            if (height_ratio < MIN_HEIGHT_RATIO) or (area_ratio < MIN_AREA_RATIO) :
+                continue
 
-                    # 检查2: 两肩高度差
-                    if abs(left_shoulder[1] - right_shoulder[1]) > 30:
-                        continue  # 排除肩膀倾斜严重的样本
-                    # 检查3: 髋部宽度合理性（新增）
-                    hip_width = np.linalg.norm(left_hip[:2] - right_hip[:2])
-                    if hip_width < 10:  # 像素单位最小阈值
-                        continue
-                    label = classify_body_type (kpts)
+            valid_anns.append (ann)
 
-                    # 检查是否已达到该类别上限
-                    if class_counts [label] < target_per_class :
-                        metadata.append ({
-                            "img_path" : img_path,
-                            "label" : label,
-                            "keypoints" : kpts.tolist ()  # 保存关键点用于后续验证
-                        })
-                        class_counts [label] += 1
+        # 选择图像中面积最大的标注
+        if not valid_anns :
+            continue
+        main_ann = max (valid_anns, key=lambda x : x ["area"])
 
-                        # 进度显示
-                        print (f"\r采集进度: { {k : v for k, v in class_counts.items () if v > 0} }", end="")
+        # 阶段2：关键点质量验证
+        kpts = np.array (main_ann ["keypoints"]).reshape (-1, 3)
+        required_joints = [5, 6, 11, 12]
 
-                        # 检查是否所有类别都已满足
-                        if all (count >= target_per_class for count in class_counts.values ()) :
-                            break
+        # 可见性检查
+        if not all (kpts [i, 2] >= MIN_VISIBILITY for i in required_joints) :
+            continue
 
-    # 保存平衡后的元数据
+        # 提取关键点坐标
+        ls = kpts [5]
+        rs = kpts [6]
+        lh = kpts [11]
+        rh = kpts [12]
+
+        # 姿势质量检查
+        def check_joint_dist (j1, j2) :
+            dist = np.linalg.norm (j1 [:2] - j2 [:2])
+            return dist > (img_w * MIN_JOINT_DIST)
+
+        # 关键点间距检查
+        if not (check_joint_dist (ls, rs) and check_joint_dist (lh, rh)) :
+            continue
+
+        # 肩部垂直对齐检查
+        if abs (ls [1] - rs [1]) > 0.1 * img_h :  # 允许10%高度差
+            continue
+
+        # 躯干朝向检查
+        shoulder_center = (ls [0] + rs [0]) / 2
+        hip_center = (lh [0] + rh [0]) / 2
+        if abs (shoulder_center - hip_center) > 0.1 * img_w :
+            continue
+
+        # 性别特征检查
+        shoulder_width = np.linalg.norm (ls [:2] - rs [:2])
+        hip_width = np.linalg.norm (lh [:2] - rh [:2])
+        shoulder_hip_ratio = shoulder_width / (hip_width + 1e-6)
+        if shoulder_hip_ratio < 0.9 :
+            continue
+
+        # 分类并保存
+        label = classify_body_type (kpts)
+        if class_counts [label] < target_per_class :
+            metadata.append ({
+                "img_path" : img_path,
+                "label" : label,
+                "keypoints" : kpts.tolist (),
+                "bbox" : main_ann ["bbox"],
+                "img_size" : [img_w, img_h]
+            })
+            class_counts [label] += 1
+            print (f"\r采集进度: { {k : v for k, v in class_counts.items () if v > 0} }", end="")
+
+    # 平衡采样
     balanced_metadata = []
     for cls in class_names :
-        balanced_metadata += [m for m in metadata if m ["label"] == cls] [:target_per_class]
+        cls_samples = [m for m in metadata if m ["label"] == cls] [:target_per_class]
+        balanced_metadata.extend (cls_samples)
 
     with open ("metadata.json", "w") as f :
         json.dump (balanced_metadata, f)
@@ -153,35 +199,60 @@ def generate_metadata () :
         f"\n最终样本分布: { {cls : len ([m for m in balanced_metadata if m ['label'] == cls]) for cls in class_names} }")
     return balanced_metadata
 
-
-# 体型分类规则（保持不变）
+# 增强的体型分类规则
 def classify_body_type (kpts) :
-    ls = kpts [5] [:2]
-    rs = kpts [6] [:2]
-    lh = kpts [11] [:2]
-    rh = kpts [12] [:2]
+    # 关键点索引（COCO格式）
+    LEFT_SHOULDER = 5
+    RIGHT_SHOULDER = 6
+    LEFT_HIP = 11
+    RIGHT_HIP = 12
+    LEFT_EAR = 3
+    RIGHT_EAR = 4
 
+    # 获取关键点坐标
+    ls = kpts [LEFT_SHOULDER] [:2]
+    rs = kpts [RIGHT_SHOULDER] [:2]
+    lh = kpts [LEFT_HIP] [:2]
+    rh = kpts [RIGHT_HIP] [:2]
+    le = kpts [LEFT_EAR] [:2]
+    re = kpts [RIGHT_EAR] [:2]
+
+    # 计算基准维度
     shoulder_width = np.linalg.norm (ls - rs)
     hip_width = np.linalg.norm (lh - rh)
-    eps = 1e-6
-    shr = shoulder_width / (hip_width + eps)
-    whr = (0.7 * shoulder_width) / (hip_width + eps)
-    # 计算新增特征：躯干长度比
-    shoulder_center = (kpts[5][:2] + kpts[6][:2]) / 2
-    hip_center = (kpts[11][:2] + kpts[12][:2]) / 2
-    torso_ratio = np.linalg.norm(shoulder_center - hip_center) / (hip_width + eps)
+    eps = 1e-6  # 防止除以零
 
-    # 更新后的分类逻辑
-    if shr > 1.15 and whr < 0.85 and torso_ratio > 1.2:
-        return 0
-    elif shr > 1.1 and whr >= 0.9:
-        return 1
-    elif shr < 0.95 and whr < 0.98:
+    # 重新定义特征计算
+    chest_center = (le + re) / 2
+    hip_center = (lh + rh) / 2
+    torso_height = np.linalg.norm (chest_center - hip_center)
+
+    # 关键比例系数
+    shoulder_hip_ratio = shoulder_width / (hip_width + eps)
+    waist_width = 0.75 * (shoulder_width + hip_width) / 2  # 综合估算腰宽
+    waist_hip_ratio = waist_width / (hip_width + eps)
+
+    # 分类逻辑（倒三角形、矩形、椭圆形）
+    if shoulder_hip_ratio > 1.15 and waist_hip_ratio < 0.85 :
+        return 0  # 倒三角形
+
+    # 放宽椭圆形标准
+    elif (waist_hip_ratio > 1.05) or \
+            (waist_width > shoulder_width) or \
+            (hip_width > shoulder_width * 1.05) :
+        return 2  # 椭圆形
+
+    # 矩形判断条件
+    elif 0.85 < shoulder_hip_ratio < 1.15 and 0.8 < waist_hip_ratio < 1.1 :
+        return 1  # 矩形
+
+    # 默认情况处理
+    else :
+        # 当肩宽明显大于臀宽时归为倒三角形
+        if shoulder_hip_ratio > 1.1 :
+            return 0
+        # 腰臀特征不明确时优先归为椭圆形
         return 2
-    else:  # 原标准型和苹果型合并
-        return 3
-
-
 # 修改后的训练流程
 def train () :
     metadata = generate_metadata ()
@@ -202,8 +273,8 @@ def train () :
     # 初始化改进后的模型
     model = CustomResNet ().to (Config.device)
     # 加载预训练权重（如果需要）
-    pretrained = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
-    model.base.load_state_dict(pretrained.state_dict(), strict=False)
+    pretrained = models.resnet50 (weights=ResNet50_Weights.IMAGENET1K_V1)
+    model.base.load_state_dict (pretrained.state_dict (), strict=False)
     # 使用更强的权重衰减
     optimizer = torch.optim.AdamW (
         model.parameters (),
@@ -233,7 +304,7 @@ def train () :
     no_improve = 0
     early_stop = False
 
-    for epoch in range (20) :  # 增加最大epoch数
+    for epoch in range (Config.num_epoch) :  # epoch数
         if early_stop :
             print ("早停触发，停止训练")
             break
@@ -355,6 +426,80 @@ def predict (image_path, keypoints=None, model_path="body_type_resnet50.pth") :
     return class_names [pred_class]
 
 
+def generate_confusion_matrix_report (model_path="body_type_resnet50.pth",
+                                      metadata_path="metadata.json",
+                                      batch_size=16) :
+    """生成并可视化混淆矩阵报告"""
+    plt.rcParams ['font.sans-serif'] = ['SimHei']
+    plt.rcParams ['axes.unicode_minus'] = False
+    # 加载元数据
+    with open (metadata_path) as f :
+        metadata = json.load (f)
+
+    # 重新划分验证集（保持与训练时相同的随机种子）
+    _, val_meta = train_test_split (metadata, test_size=0.2, random_state=42)
+
+    # 创建数据集和数据加载器
+    val_set = CocoBodyDataset (val_meta)
+    val_loader = DataLoader (
+        val_set,
+        batch_size=batch_size,
+        num_workers=0,
+        collate_fn=collate_fn
+    )
+
+    # 初始化模型
+    model = CustomResNet ().to (Config.device)
+    model.load_state_dict (torch.load (model_path, map_location=Config.device))
+    model.eval ()
+
+    # 收集预测结果
+    all_preds = []
+    all_labels = []
+
+    with torch.no_grad () :
+        for inputs, labels in val_loader :
+            if len (inputs) == 0 :
+                continue
+            inputs = inputs.to (Config.device)
+            outputs = model (inputs)
+            _, preds = torch.max (outputs, 1)
+
+            all_preds.extend (preds.cpu ().numpy ())
+            all_labels.extend (labels.cpu ().numpy ())
+
+    # 生成混淆矩阵
+    cm = confusion_matrix (all_labels, all_preds)
+    report = classification_report (
+        all_labels, all_preds,
+        target_names=class_names.values (),
+        output_dict=True
+    )
+
+    # 可视化
+    plt.figure (figsize=(12, 10))
+    sns.heatmap (cm, annot=True, fmt="d",
+                 xticklabels=class_names.values (),
+                 yticklabels=class_names.values (),
+                 cmap="Blues")
+    plt.title ("Confusion Matrix")
+    plt.xlabel ("Predicted Label")
+    plt.ylabel ("True Label")
+    plt.xticks (rotation=45)
+    plt.yticks (rotation=0)
+    plt.tight_layout ()
+    plt.show ()
+
+    # 打印分类报告
+    print ("\n详细分类指标：")
+    print (classification_report (
+        all_labels, all_preds,
+        target_names=class_names.values ()
+    ))
+
+    return cm, report
+
+
 # 顺序验证函数
 def sequential_validation (max_samples=100) :
     # 初始化COCO API
@@ -411,7 +556,7 @@ def sequential_validation (max_samples=100) :
             print (f"验证失败: {str (e)}")
 
 
-# 新增关键点绘制函数
+# 关键点绘制函数
 def draw_keypoints (image, keypoints, connections=None) :
     """
     在图像上绘制关键点和骨架连线
@@ -451,6 +596,7 @@ def draw_keypoints (image, keypoints, connections=None) :
 
 
 if __name__ == "__main__" :
-    # train()
-    sequential_validation(max_samples=100)  # 验证时可以减少样本数量
+    # train ()
+    sequential_validation (max_samples=10)  # 验证时可以减少样本数量
     # generate_metadata ()
+    # generate_confusion_matrix_report ()
